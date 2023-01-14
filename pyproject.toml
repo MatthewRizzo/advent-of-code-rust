@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "advent-of-code-2022-rust"
+version = "0.1.0"
+description = "Minimal pyproject for pre-commit requirements."
+authors = ["Matthew Rizzo mattrizzo21@gmail.com"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mattrizzo-devops = {git = "https://github.com/MatthewRizzo/mattrizzo_devops"}
+setuptools = "58.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
