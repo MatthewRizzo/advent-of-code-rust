@@ -9,3 +9,11 @@ edition = "2021"
 [[bin]]
 name = "day1a"
 path = "day1/day1a/src/main.rs"
+
+
+[lib]
+name = "advent_common"
+path = "common/src/lib.rs"
+
+[dependencies]
+thiserror = "1.0.38"
