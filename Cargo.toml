@@ -1,0 +1,11 @@
+[package]
+name = "advent-of-code-rust"
+version = "0.1.0"
+edition = "2021"
+
+
+# Use cargo run --bin <subdir name> to run the binary for each day
+
+[[bin]]
+name = "day1a"
+path = "day1/day1a/src/main.rs"
