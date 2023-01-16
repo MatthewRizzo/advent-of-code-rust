@@ -6,14 +6,23 @@ edition = "2021"
 
 # Use cargo run --bin <subdir name> to run the binary for each day
 
-[[bin]]
-name = "day1a"
-path = "day1/day1a/src/main.rs"
+[workspace]
 
+members = [
+    "advent_cli",
+    "common",
+    "day1"
+]
+
+[[bin]]
+name = "cli"
+path = "advent_cli/src/main.rs"
 
 [lib]
 name = "advent_common"
 path = "common/src/lib.rs"
 
 [dependencies]
+clap = "4.1.1"
 thiserror = "1.0.38"
+advent_cli = { path = "advent_cli" }

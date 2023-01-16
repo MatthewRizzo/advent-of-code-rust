@@ -1,10 +1,15 @@
 [package]
-name = "advent_common"
+name = "advent_cli"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+name = "advent_cli"
+path = "src/lib.rs"
+
 [dependencies]
+advent_common = { path = "../common" }
 clap = { version = "4.1.1", features = ["derive"]}
-thiserror = "1.0.38"
+advent_day1 = { path = "../day1" }
