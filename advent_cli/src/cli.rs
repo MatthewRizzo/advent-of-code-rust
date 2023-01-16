@@ -4,10 +4,13 @@ use clap::{Parser, Subcommand};
 
 use advent_common::{command::AdventSolution, errors::AdventResult};
 
+/// CLI option for every day/binary.
+/// All should implement AdventSolution
 #[derive(Subcommand, Clone, Debug)]
 pub enum AdventCommands {
     /// Run the program from day1a
     Day1a(advent_day1::solution::Day1a),
+    Day1b(advent_day1::solution::Day1b),
 }
 
 impl AdventSolution for AdventCommands {
@@ -16,6 +19,7 @@ impl AdventSolution for AdventCommands {
 
         match self {
             Day1a(cmd) => cmd.find_solution(),
+            Day1b(cmd) => cmd.find_solution(),
         }
     }
 }

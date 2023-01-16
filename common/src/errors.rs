@@ -13,4 +13,6 @@ pub enum AdventErrors {
     IOError(#[from] std::io::Error),
     #[error("String -> int error")]
     ParseError(#[from] ParseIntError),
+    #[error("Solution not implemented")]
+    SolutionNotImplemented(String),
 }
