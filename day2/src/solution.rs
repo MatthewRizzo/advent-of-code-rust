@@ -13,6 +13,17 @@ enum GameOptions {
     Scissors = 3,
 }
 
+struct ChoiceRelationship {
+    beats: GameOptions,
+    loses_to: GameOptions,
+}
+
+impl ChoiceRelationship {
+    fn new(beats: GameOptions, loses_to: GameOptions) -> Self {
+        Self { beats, loses_to }
+    }
+}
+
 impl GameOptions {
     /// Resolves the outcome of a match between 2 players.
     fn resolve_match(player: &GameOptions, opponent: &GameOptions) -> AdventResult<MatchResult> {
@@ -42,6 +53,35 @@ impl GameOptions {
                     Ok(MatchResult::Player)
                 }
             }
+        }
+    }
+
+    fn get_relationship(&self) -> AdventResult<ChoiceRelationship> {
+        match self {
+            &GameOptions::Rock => Ok(ChoiceRelationship::new(
+                GameOptions::Scissors,
+                GameOptions::Paper,
+            )),
+            &GameOptions::Paper => Ok(ChoiceRelationship::new(
+                GameOptions::Rock,
+                GameOptions::Scissors,
+            )),
+            &GameOptions::Scissors => Ok(ChoiceRelationship::new(
+                GameOptions::Paper,
+                GameOptions::Rock,
+            )),
+        }
+    }
+
+    /// Given the opponent's choice and desired result, determines what the player should pick
+    fn determine_players_choice(
+        opponent: &GameOptions,
+        desired_result: &MatchResult,
+    ) -> AdventResult<GameOptions> {
+        match desired_result {
+            &MatchResult::Tie => Ok(opponent.clone()),
+            &MatchResult::Opponent => Ok(opponent.get_relationship()?.beats),
+            &MatchResult::Player => Ok(opponent.get_relationship()?.loses_to),
         }
     }
 }
@@ -94,6 +134,13 @@ impl PlayerStrategyMap {
             PlayerStrategyMap::Z => GameOptions::Scissors,
         }
     }
+    fn translate_to_match_result(&self) -> MatchResult {
+        match &self {
+            PlayerStrategyMap::X => MatchResult::Opponent,
+            PlayerStrategyMap::Y => MatchResult::Tie,
+            PlayerStrategyMap::Z => MatchResult::Player,
+        }
+    }
 }
 
 impl FromStr for PlayerStrategyMap {
@@ -118,6 +165,43 @@ enum MatchResult {
     Player = 6,
 }
 
+fn validate_line_len(raw_line: &str, split_line: &Vec<&str>) -> AdventResult<()> {
+    if split_line.len() > 2 {
+        Err(AdventErrors::AdventError(format!(
+            "Line {} had more than 2 entries",
+            raw_line
+        )))
+    } else if split_line.len() < 2 {
+        Err(AdventErrors::AdventError(format!(
+            "Line {} had less than 2 entries",
+            raw_line
+        )))
+    } else {
+        Ok(())
+    }
+}
+
+fn get_match_score(player_choice: &GameOptions, match_winner: &MatchResult) -> AdventResult<u8> {
+    let match_res_score = *match_winner as u8;
+    let shape_selection_score = *player_choice as u8;
+    let current_match_res = match_res_score + shape_selection_score;
+    println!("\n---------------------------");
+    println!("Current match info:");
+    println!(
+        "Player: {:?} vs Opponent: {:?}",
+        player_choice, match_winner
+    );
+    println!(
+        "match_winner = {:?} - {} points",
+        match_winner, match_res_score
+    );
+    println!("score from shape = {:?}", shape_selection_score);
+    println!("Overall points from match: {:?}", current_match_res);
+    println!("---------------------------\n");
+
+    Ok(current_match_res)
+}
+
 #[derive(Args, Clone, Debug)]
 pub struct Day2a {
     /// Path to strategy guide file relative to this file's directory
@@ -128,6 +212,19 @@ pub struct Day2a {
 impl AdventSolution for Day2a {
     fn find_solution(&self) -> AdventResult<String> {
         self.solve_problem_2a()
+    }
+}
+
+#[derive(Args, Clone, Debug)]
+pub struct Day2b {
+    /// Path to strategy guide file relative to this file's directory
+    #[arg(short, long, default_value = "strategy_guide.txt")]
+    file_name: PathBuf,
+}
+
+impl AdventSolution for Day2b {
+    fn find_solution(&self) -> AdventResult<String> {
+        self.solve_problem_2b()
     }
 }
 
@@ -144,27 +241,12 @@ impl Day2a {
         let mut total_score: u64 = 0;
         for line in input.lines() {
             let split_line = line.split(" ").collect::<Vec<&str>>();
-            self.validate_line_len(line, &split_line)?;
+            validate_line_len(line, &split_line)?;
             let opponent_input = OpponentStrategyMap::from_str(&split_line[0])?.de_encrypt_input();
             let player_input = PlayerStrategyMap::from_str(&split_line[1])?.de_encrypt_input();
             let match_winner = GameOptions::resolve_match(&player_input, &opponent_input)?;
 
-            let match_res_score = match_winner as u8;
-            let shape_selection_score = player_input as u8;
-            let current_match_res = match_res_score + shape_selection_score;
-            println!("\n---------------------------");
-            println!("Current match info:");
-            println!(
-                "Player: {:?} vs Opponent: {:?}",
-                player_input, opponent_input
-            );
-            println!(
-                "match_winner = {:?} - {} points",
-                match_winner, match_res_score
-            );
-            println!("score from shape = {:?}", shape_selection_score);
-            println!("Overall points from match: {:?}", current_match_res);
-            println!("---------------------------\n");
+            let current_match_res = get_match_score(&player_input, &match_winner)?;
 
             total_score += current_match_res as u64;
         }
@@ -172,21 +254,37 @@ impl Day2a {
         let res_str = format!("The total score is {}", total_score);
         Ok(res_str)
     }
+}
 
-    fn validate_line_len(&self, raw_line: &str, split_line: &Vec<&str>) -> AdventResult<()> {
-        if split_line.len() > 2 {
-            Err(AdventErrors::AdventError(format!(
-                "Line {} had more than 2 entries",
-                raw_line
-            )))
-        } else if split_line.len() < 2 {
-            Err(AdventErrors::AdventError(format!(
-                "Line {} had less than 2 entries",
-                raw_line
-            )))
-        } else {
-            Ok(())
+impl Day2b {
+    fn solve_problem_2b(&self) -> AdventResult<String> {
+        let project_root_dir: PathBuf = utils::get_project_root()?;
+        let input_file_path: PathBuf = project_root_dir
+            .as_path()
+            .join("day2")
+            .join(&self.file_name);
+
+        let input: String = fs::read_to_string(input_file_path)?;
+        let mut total_score: u64 = 0;
+        for line in input.lines() {
+            let split_line = line.split(" ").collect::<Vec<&str>>();
+            validate_line_len(line, &split_line)?;
+            let opponent_input = OpponentStrategyMap::from_str(&split_line[0])?.de_encrypt_input();
+            let desired_match_result =
+                PlayerStrategyMap::from_str(&split_line[1])?.translate_to_match_result();
+
+            let player_choice =
+                GameOptions::determine_players_choice(&opponent_input, &desired_match_result)?;
+
+            // resolve the match now that we know what the inputs are
+            let match_winner = GameOptions::resolve_match(&player_choice, &opponent_input)?;
+            let current_match_res = get_match_score(&player_choice, &match_winner)?;
+
+            total_score += current_match_res as u64;
         }
+
+        let res_str = format!("The total score is {}", total_score);
+        Ok(res_str)
     }
 }
 
