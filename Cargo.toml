@@ -11,7 +11,8 @@ edition = "2021"
 members = [
     "advent_cli",
     "common",
-    "day1"
+    "day1",
+    "day2"
 ]
 
 [[bin]]

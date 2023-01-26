@@ -13,3 +13,4 @@ path = "src/lib.rs"
 advent_common = { path = "../common" }
 clap = { version = "4.1.1", features = ["derive"]}
 advent_day1 = { path = "../day1" }
+advent_day2 = { path = "../day2" }

@@ -11,6 +11,7 @@ pub enum AdventCommands {
     /// Run the program from day1a
     Day1a(advent_day1::solution::Day1a),
     Day1b(advent_day1::solution::Day1b),
+    Day2a(advent_day2::solution::Day2a),
 }
 
 impl AdventSolution for AdventCommands {
@@ -20,6 +21,7 @@ impl AdventSolution for AdventCommands {
         match self {
             Day1a(cmd) => cmd.find_solution(),
             Day1b(cmd) => cmd.find_solution(),
+            Day2a(cmd) => cmd.find_solution(),
         }
     }
 }
@@ -39,7 +41,7 @@ pub fn run_cli() {
 
     match cmd_res {
         Err(err) => {
-            println!("Error Running command : <print cmd>.\n Error: {}", err);
+            println!("Error Running command : <print cmd>.\n Error: {:?}", err);
         }
         Ok(res) => {
             println!("{}", res);
