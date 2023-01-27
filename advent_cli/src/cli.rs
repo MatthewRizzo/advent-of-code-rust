@@ -13,6 +13,7 @@ pub enum AdventCommands {
     Day1b(advent_day1::solution::Day1b),
     Day2a(advent_day2::solution::Day2a),
     Day2b(advent_day2::solution::Day2b),
+    Day3a(advent_day3::solution::Day3a),
 }
 
 impl AdventSolution for AdventCommands {
@@ -24,6 +25,7 @@ impl AdventSolution for AdventCommands {
             Day1b(cmd) => cmd.find_solution(),
             Day2a(cmd) => cmd.find_solution(),
             Day2b(cmd) => cmd.find_solution(),
+            Day3a(cmd) => cmd.find_solution(),
         }
     }
 }
