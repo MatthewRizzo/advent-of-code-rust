@@ -1,0 +1,13 @@
+[package]
+name = "advent_day3"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "advent_day3"
+path = "src/lib.rs"
+
+
+[dependencies]
+advent_common = { path = "../common" }
+clap = { version = "4.1.1", features = ["derive"] }
