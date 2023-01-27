@@ -31,22 +31,22 @@ impl GameOptions {
             return Ok(MatchResult::Tie);
         }
 
-        match player {
-            &GameOptions::Rock => {
+        match *player {
+            GameOptions::Rock => {
                 if opponent == &GameOptions::Paper {
                     Ok(MatchResult::Opponent)
                 } else {
                     Ok(MatchResult::Player)
                 }
             }
-            &GameOptions::Paper => {
+            GameOptions::Paper => {
                 if opponent == &GameOptions::Scissors {
                     Ok(MatchResult::Opponent)
                 } else {
                     Ok(MatchResult::Player)
                 }
             }
-            &GameOptions::Scissors => {
+            GameOptions::Scissors => {
                 if opponent == &GameOptions::Rock {
                     Ok(MatchResult::Opponent)
                 } else {
@@ -57,16 +57,16 @@ impl GameOptions {
     }
 
     fn get_relationship(&self) -> AdventResult<ChoiceRelationship> {
-        match self {
-            &GameOptions::Rock => Ok(ChoiceRelationship::new(
+        match *self {
+            GameOptions::Rock => Ok(ChoiceRelationship::new(
                 GameOptions::Scissors,
                 GameOptions::Paper,
             )),
-            &GameOptions::Paper => Ok(ChoiceRelationship::new(
+            GameOptions::Paper => Ok(ChoiceRelationship::new(
                 GameOptions::Rock,
                 GameOptions::Scissors,
             )),
-            &GameOptions::Scissors => Ok(ChoiceRelationship::new(
+            GameOptions::Scissors => Ok(ChoiceRelationship::new(
                 GameOptions::Paper,
                 GameOptions::Rock,
             )),
@@ -78,10 +78,10 @@ impl GameOptions {
         opponent: &GameOptions,
         desired_result: &MatchResult,
     ) -> AdventResult<GameOptions> {
-        match desired_result {
-            &MatchResult::Tie => Ok(opponent.clone()),
-            &MatchResult::Opponent => Ok(opponent.get_relationship()?.beats),
-            &MatchResult::Player => Ok(opponent.get_relationship()?.loses_to),
+        match *desired_result {
+            MatchResult::Tie => Ok(*opponent),
+            MatchResult::Opponent => Ok(opponent.get_relationship()?.beats),
+            MatchResult::Player => Ok(opponent.get_relationship()?.loses_to),
         }
     }
 }
@@ -166,18 +166,17 @@ enum MatchResult {
 }
 
 fn validate_line_len(raw_line: &str, split_line: &Vec<&str>) -> AdventResult<()> {
-    if split_line.len() > 2 {
-        Err(AdventErrors::AdventError(format!(
+    let len = split_line.len();
+    match len {
+        len if len > 2 => Err(AdventErrors::AdventError(format!(
             "Line {} had more than 2 entries",
             raw_line
-        )))
-    } else if split_line.len() < 2 {
-        Err(AdventErrors::AdventError(format!(
+        ))),
+        len if len < 2 => Err(AdventErrors::AdventError(format!(
             "Line {} had less than 2 entries",
             raw_line
-        )))
-    } else {
-        Ok(())
+        ))),
+        _ => Ok(()),
     }
 }
 
@@ -240,10 +239,10 @@ impl Day2a {
 
         let mut total_score: u64 = 0;
         for line in input.lines() {
-            let split_line = line.split(" ").collect::<Vec<&str>>();
+            let split_line = line.split(' ').collect::<Vec<&str>>();
             validate_line_len(line, &split_line)?;
-            let opponent_input = OpponentStrategyMap::from_str(&split_line[0])?.de_encrypt_input();
-            let player_input = PlayerStrategyMap::from_str(&split_line[1])?.de_encrypt_input();
+            let opponent_input = OpponentStrategyMap::from_str(split_line[0])?.de_encrypt_input();
+            let player_input = PlayerStrategyMap::from_str(split_line[1])?.de_encrypt_input();
             let match_winner = GameOptions::resolve_match(&player_input, &opponent_input)?;
 
             let current_match_res = get_match_score(&player_input, &match_winner)?;
@@ -267,11 +266,11 @@ impl Day2b {
         let input: String = fs::read_to_string(input_file_path)?;
         let mut total_score: u64 = 0;
         for line in input.lines() {
-            let split_line = line.split(" ").collect::<Vec<&str>>();
+            let split_line = line.split(' ').collect::<Vec<&str>>();
             validate_line_len(line, &split_line)?;
-            let opponent_input = OpponentStrategyMap::from_str(&split_line[0])?.de_encrypt_input();
+            let opponent_input = OpponentStrategyMap::from_str(split_line[0])?.de_encrypt_input();
             let desired_match_result =
-                PlayerStrategyMap::from_str(&split_line[1])?.translate_to_match_result();
+                PlayerStrategyMap::from_str(split_line[1])?.translate_to_match_result();
 
             let player_choice =
                 GameOptions::determine_players_choice(&opponent_input, &desired_match_result)?;
