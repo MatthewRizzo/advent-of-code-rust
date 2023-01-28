@@ -8,7 +8,6 @@ use advent_common::{command::AdventSolution, errors::AdventResult};
 /// All should implement AdventSolution
 #[derive(Subcommand, Clone, Debug)]
 pub enum AdventCommands {
-    /// Run the program from day1a
     Day1a(advent_day1::solution::Day1a),
     Day1b(advent_day1::solution::Day1b),
     Day2a(advent_day2::solution::Day2a),
@@ -36,7 +35,6 @@ impl AdventSolution for AdventCommands {
     }
 }
 
-/// Simple program to greet a person
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub(crate) struct AdventCLI {

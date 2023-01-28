@@ -102,6 +102,7 @@ impl Pair {
     }
 }
 
+/// Run the program for Day 4a
 #[derive(Args, Clone, Debug)]
 pub struct Day4a {
     /// Path to strategy guide file relative to this file's directory
@@ -141,6 +142,7 @@ impl AdventSolution for Day4a {
     }
 }
 
+/// Run the program for Day 4b
 #[derive(Args, Clone, Debug)]
 pub struct Day4b {
     /// Path to strategy guide file relative to this file's directory

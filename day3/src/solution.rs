@@ -83,6 +83,7 @@ impl Day3Common {
     }
 }
 
+/// Run the program for Day 3a
 #[derive(Args, Clone, Debug)]
 pub struct Day3a {
     /// Path to strategy guide file relative to this file's directory
@@ -95,6 +96,7 @@ struct ElfGroup {
     group: [Rucksack; 3],
 }
 
+/// Run the program for Day 3b
 #[derive(Args, Clone, Debug)]
 pub struct Day3b {
     /// Path to strategy guide file relative to this file's directory

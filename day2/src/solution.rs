@@ -201,6 +201,7 @@ fn get_match_score(player_choice: &GameOptions, match_winner: &MatchResult) -> A
     Ok(current_match_res)
 }
 
+/// Run the program for Day 2a
 #[derive(Args, Clone, Debug)]
 pub struct Day2a {
     /// Path to strategy guide file relative to this file's directory
@@ -214,6 +215,7 @@ impl AdventSolution for Day2a {
     }
 }
 
+/// Run the program for Day 2b
 #[derive(Args, Clone, Debug)]
 pub struct Day2b {
     /// Path to strategy guide file relative to this file's directory

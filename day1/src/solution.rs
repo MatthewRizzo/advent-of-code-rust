@@ -76,6 +76,7 @@ pub(crate) fn solve_problem_1b() -> AdventResult<String> {
     Ok(res_msg)
 }
 
+/// Run the program for Day 1a
 #[derive(Args, Clone, Debug)]
 pub struct Day1a {}
 
@@ -85,6 +86,7 @@ impl AdventSolution for Day1a {
     }
 }
 
+/// Run the program for Day 1b
 #[derive(Args, Clone, Debug)]
 pub struct Day1b {}
 
