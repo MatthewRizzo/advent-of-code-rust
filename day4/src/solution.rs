@@ -48,6 +48,20 @@ impl Range {
             Ok(false)
         }
     }
+
+    ///
+    /// # Returns
+    /// * `true` - if self starts or ends within the other
+    /// * `false` - otherwise
+    ///
+    /// # Note
+    /// This only checks if self is overlapped.
+    /// It must also be applied in reverse to test both cases.
+    fn is_overlapped(&self, other: &Range) -> AdventResult<bool> {
+        let res = (other.start <= self.start && self.start <= other.end)
+            || (other.start <= self.end && self.end <= other.end);
+        Ok(res)
+    }
 }
 
 #[derive(Default, Debug, Clone)]
@@ -80,6 +94,11 @@ impl Pair {
     /// Determines if one of the elves range's fully encompass the other's
     fn is_fully_contained(&self) -> AdventResult<bool> {
         self.elf_one.is_within_other(&self.elf_two)
+    }
+
+    fn is_overlap(&self) -> AdventResult<bool> {
+        Ok(self.elf_one.is_overlapped(&self.elf_two)?
+            || self.elf_two.is_overlapped(&self.elf_one)?)
     }
 }
 
@@ -122,6 +141,45 @@ impl AdventSolution for Day4a {
     }
 }
 
+#[derive(Args, Clone, Debug)]
+pub struct Day4b {
+    /// Path to strategy guide file relative to this file's directory
+    #[arg(short, long, default_value = "input.txt")]
+    file_name: PathBuf,
+}
+
+impl Day4b {
+    pub(crate) fn solve_problem_4b(&self) -> AdventResult<String> {
+        let project_root_dir: PathBuf = utils::get_project_root()?;
+        let input_file_path: PathBuf = project_root_dir
+            .as_path()
+            .join("day4")
+            .join(&self.file_name);
+
+        let input: String = fs::read_to_string(input_file_path)?;
+
+        let mut num_overlapped_pairs = 0;
+
+        for line in input.lines() {
+            let elf_pair: Pair = Pair::from_line(line.to_string())?;
+            if elf_pair.is_overlap()? {
+                num_overlapped_pairs += 1;
+            }
+        }
+
+        Ok(format!(
+            "Total pairs with overlap: {}",
+            num_overlapped_pairs
+        ))
+    }
+}
+
+impl AdventSolution for Day4b {
+    fn find_solution(&self) -> AdventResult<String> {
+        self.solve_problem_4b()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
@@ -140,20 +198,62 @@ mod tests {
             inside_range,
             larger_range
         );
+    }
 
-        let larger_range2: Range = Range::new(0, 2);
-        let inside_range2: Range = Range::new(0, 7);
-        assert!(larger_range2
-            .is_within_other(&inside_range2)
-            .expect("Should not error"));
+    #[test]
+    fn test_is_overlap() {
+        let test1_range1: Range = Range::new(2, 4);
+        let test1_range2: Range = Range::new(6, 8);
+        let test1_pair_1 = Pair {
+            elf_one: test1_range1,
+            elf_two: test1_range2,
+        };
 
-        let overlap_range1: Range = Range::new(0, 5);
-        let overlap_range2: Range = Range::new(3, 7);
-        assert!(
-            overlap_range1
-                .is_within_other(&overlap_range2)
-                .expect("Should not error")
-                == false
-        );
+        assert!(test1_pair_1.is_overlap().expect("Shouldn't error") == false);
+
+        let test2_range1: Range = Range::new(2, 3);
+        let test2_range2: Range = Range::new(4, 5);
+        let test2_pair = Pair {
+            elf_one: test2_range1,
+            elf_two: test2_range2,
+        };
+
+        assert!(test2_pair.is_overlap().expect("Shouldn't error") == false);
+
+        let test3_range1: Range = Range::new(5, 7);
+        let test3_range2: Range = Range::new(7, 9);
+        let test3_pair = Pair {
+            elf_one: test3_range1,
+            elf_two: test3_range2,
+        };
+
+        assert!(test3_pair.is_overlap().expect("Shouldn't error"));
+
+        let test4_range1: Range = Range::new(2, 8);
+        let test4_range2: Range = Range::new(3, 7);
+        let test4_pair = Pair {
+            elf_one: test4_range1,
+            elf_two: test4_range2,
+        };
+
+        assert!(test4_pair.is_overlap().expect("Shouldn't error"));
+
+        let test5_range1: Range = Range::new(6, 6);
+        let test5_range2: Range = Range::new(4, 6);
+        let test5_pair = Pair {
+            elf_one: test5_range1,
+            elf_two: test5_range2,
+        };
+
+        assert!(test5_pair.is_overlap().expect("Shouldn't error"));
+
+        let test6_range1: Range = Range::new(2, 6);
+        let test6_range2: Range = Range::new(4, 8);
+        let test6_pair = Pair {
+            elf_one: test6_range1,
+            elf_two: test6_range2,
+        };
+
+        assert!(test6_pair.is_overlap().expect("Shouldn't error"));
     }
 }
