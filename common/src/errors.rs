@@ -15,4 +15,6 @@ pub enum AdventErrors {
     ParseError(#[from] ParseIntError),
     #[error("Solution not implemented")]
     SolutionNotImplemented(String),
+    #[error("Error converting from u8 buf to str")]
+    FromUtf8Error(#[from] std::str::Utf8Error),
 }
